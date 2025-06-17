@@ -50,8 +50,6 @@ function Table() {
       return item[column];
     } else if (path === "profession") {
       return <Profession item={item} column={column} />;
-    } else if (path === "qualities") {
-      return <Quality item={item} column={column} />;
     }
   };
 
@@ -70,7 +68,15 @@ function Table() {
           {data.users.map((item) => (
             <tr key={item._id}>
               {Object.keys(columns).map((column) => {
-                return <td key={column}>{renderColumn(item, column)}</td>;
+                return (
+                  <td key={column}>
+                    {column === "qualities" ? (
+                      <Quality item={item} column={column} />
+                    ) : (
+                      renderColumn(item, column)
+                    )}
+                  </td>
+                );
               })}
             </tr>
           ))}
