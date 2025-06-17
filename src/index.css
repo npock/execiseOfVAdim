@@ -69,3 +69,30 @@ tbody tr.active-row {
   font-weight: bold;
   color: #009879;
 }
+
+.itemQualities {
+  width: auto;
+  height: 20px;
+  border-radius: 5px;
+  margin-left: 5px;
+  padding: 1px 3px 1px 3px;
+}
+
+.primary {
+  background-color: #007bff;
+}
+.secondary {
+  background-color: #6c757d;
+}
+.success {
+  background-color: greenyellow;
+}
+.danger {
+  background-color: red;
+}
+.info {
+  background-color: #30d5c8;
+}
+.dark {
+  background-color: darkgrey;
+}
