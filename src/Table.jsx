@@ -1,6 +1,17 @@
 import { data } from "./data"; //  используем начальные данные
 import "./Table.css";
 
+const Profession = ({ item, column }) => {
+  return item[column].name;
+};
+const Quality = ({ item, column }) => {
+  return item[column].map((item) => (
+    <p key={item._id} className={"itemQualities " + item.color}>
+      {item.name}
+    </p>
+  ));
+};
+
 function Table() {
   const columns = {
     name: {
@@ -17,11 +28,6 @@ function Table() {
     qualities: {
       path: "qualities",
       name: "Качества",
-      component: (item, column) => {
-        return item[column].map((item) => (
-          <p className={"itemQualities " + item.color}>{item.name}</p>
-        ));
-      },
     },
     profession: {
       path: "profession",
@@ -43,7 +49,9 @@ function Table() {
     } else if (path === "age") {
       return item[column];
     } else if (path === "profession") {
-      return item[column].name;
+      return <Profession item={item} column={column} />;
+    } else if (path === "qualities") {
+      return <Quality item={item} column={column} />;
     }
   };
 
@@ -68,8 +76,6 @@ function Table() {
           ))}
         </tbody>
       </table>
-
-      {/* делаем динамический рендер таблицы */}
     </>
   );
 }
