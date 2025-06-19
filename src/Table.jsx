@@ -1,9 +1,11 @@
-import { data } from "./data"; //  используем начальные данные
+import { data } from "./data";
 import "./Table.css";
+import { useState } from "react";
 
 const Profession = ({ item, column }) => {
   return item[column].name;
 };
+
 const Quality = ({ item, column }) => {
   return item[column].map((item) => (
     <p key={item._id} className={"itemQualities " + item.color}>
@@ -13,6 +15,11 @@ const Quality = ({ item, column }) => {
 };
 
 function Table() {
+  const [users, setUsers] = useState(data.users);
+  const [sortingProfession, setSortingProfession] = useState(false);
+  const [sortingName, setSortingName] = useState(false);
+  const [sortingAge, setSortingAge] = useState(false);
+
   const columns = {
     name: {
       path: "name",
@@ -20,10 +27,37 @@ function Table() {
       component: (item) => {
         return <p>{item.name}</p>;
       },
+      sort: (a, b) => {
+        if (a.name > b.name) {
+          return 1;
+        }
+        if (a.name < b.name) {
+          return -1;
+        }
+        return 0;
+      },
     },
     age: {
       path: "age",
       name: "Возраст",
+
+      sort: (a, b) => {
+        if (a.age > b.age) {
+          return 1;
+        }
+        if (a.age < b.age) {
+          return -1;
+        }
+        if (a.age === b.age) {
+          if (a.name > b.name) {
+            return 1;
+          }
+          if (a.name < b.name) {
+            return -1;
+          }
+          return 0;
+        }
+      },
     },
     qualities: {
       path: "qualities",
@@ -32,6 +66,15 @@ function Table() {
     profession: {
       path: "profession",
       name: "Профессия",
+      sort: (a, b) => {
+        if (a.profession.name > b.profession.name) {
+          return 1;
+        }
+        if (a.profession.name < b.profession.name) {
+          return -1;
+        }
+        return 0;
+      },
     },
     delete: {
       name: "Удалить",
@@ -53,6 +96,36 @@ function Table() {
     }
   };
 
+  const sortUsers = (column) => {
+    setUsers((users) => {
+      if (column === "name") {
+        if (sortingName === false) {
+          setSortingName(true);
+          return users.toSorted(columns[column].sort);
+        } else {
+          setSortingName(false);
+          return users.toReversed();
+        }
+      } else if (column === "age") {
+        if (sortingAge === false) {
+          setSortingAge(true);
+          return users.toSorted(columns[column].sort);
+        } else {
+          setSortingAge(false);
+          return users.toReversed();
+        }
+      } else if (column === "profession") {
+        if (sortingProfession === false) {
+          setSortingProfession(true);
+          return users.toSorted(columns[column].sort);
+        } else {
+          setSortingProfession(false);
+          return users.toReversed();
+        }
+      }
+    });
+  };
+
   return (
     <>
       <h1>Table</h1>
@@ -60,12 +133,19 @@ function Table() {
         <thead>
           <tr>
             {Object.keys(columns).map((column) => (
-              <th key={column}>{columns[column].name}</th>
+              <th
+                key={column}
+                onClick={() => {
+                  sortUsers(column);
+                }}
+              >
+                {columns[column].name}
+              </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {data.users.map((item) => (
+          {users.map((item) => (
             <tr key={item._id}>
               {Object.keys(columns).map((column) => {
                 return (
