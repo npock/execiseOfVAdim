@@ -16,9 +16,7 @@ const Quality = ({ item, column }) => {
 
 function Table() {
   const [users, setUsers] = useState(data.users);
-  const [sortingProfession, setSortingProfession] = useState(false);
-  const [sortingName, setSortingName] = useState(false);
-  const [sortingAge, setSortingAge] = useState(false);
+  const [sorting, setSorting] = useState(false);
 
   const columns = {
     name: {
@@ -27,7 +25,7 @@ function Table() {
       component: (item) => {
         return <p>{item.name}</p>;
       },
-      sort: (a, b) => {
+      sorting: (a, b) => {
         if (a.name > b.name) {
           return 1;
         }
@@ -41,7 +39,7 @@ function Table() {
       path: "age",
       name: "Возраст",
 
-      sort: (a, b) => {
+      sorting: (a, b) => {
         if (a.age > b.age) {
           return 1;
         }
@@ -66,7 +64,7 @@ function Table() {
     profession: {
       path: "profession",
       name: "Профессия",
-      sort: (a, b) => {
+      sorting: (b, a) => {
         if (a.profession.name > b.profession.name) {
           return 1;
         }
@@ -98,30 +96,12 @@ function Table() {
 
   const sortUsers = (column) => {
     setUsers((users) => {
-      if (column === "name") {
-        if (sortingName === false) {
-          setSortingName(true);
-          return users.toSorted(columns[column].sort);
-        } else {
-          setSortingName(false);
-          return users.toReversed();
-        }
-      } else if (column === "age") {
-        if (sortingAge === false) {
-          setSortingAge(true);
-          return users.toSorted(columns[column].sort);
-        } else {
-          setSortingAge(false);
-          return users.toReversed();
-        }
-      } else if (column === "profession") {
-        if (sortingProfession === false) {
-          setSortingProfession(true);
-          return users.toSorted(columns[column].sort);
-        } else {
-          setSortingProfession(false);
-          return users.toReversed();
-        }
+      if (sorting === false) {
+        setSorting(true);
+        return users.toSorted(columns[column].sorting);
+      } else {
+        setSorting(false);
+        return users.toSorted((a, b) => columns[column].sorting(b, a));
       }
     });
   };
