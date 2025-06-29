@@ -50,7 +50,10 @@ thead tr {
   color: #ffffff;
   text-align: left;
 }
-th,
+th {
+  padding: 12px 15px;
+  text-align: center;
+}
 td {
   padding: 12px 15px;
   text-align: center;
@@ -70,9 +73,7 @@ tbody tr.active-row {
   color: #009879;
 }
 
-.itemQualities {
-  width: auto;
-  height: 20px;
+.itemQuality {
   border-radius: 5px;
   margin-left: 5px;
   padding: 1px 3px 1px 3px;
@@ -95,4 +96,15 @@ tbody tr.active-row {
 }
 .dark {
   background-color: darkgrey;
+}
+.up {
+  display: inline-block;
+  border: 10px solid transparent;
+  border-bottom: 10px solid white;
+}
+.down {
+  display: inline-block;
+  border: 10px solid transparent;
+  border-top: 10px solid white;
+  padding-bottom: 0px;
 }

@@ -1,81 +1,35 @@
 import { data } from "./data";
 import "./Table.css";
+import { Qualities, Profession } from "./components";
 import { useState } from "react";
 
-const Profession = ({ item, column }) => {
-  return item[column].name;
-};
-
-const Quality = ({ item, column }) => {
-  return item[column].map((item) => (
-    <p key={item._id} className={"itemQualities " + item.color}>
-      {item.name}
-    </p>
-  ));
-};
-
-function Table() {
-  const [users, setUsers] = useState(data.users);
-  const [sorting, setSorting] = useState(false);
+export const Table = () => {
+  const [sortBy, setSortBy] = useState({ path: "name", order: "asc" });
 
   const columns = {
     name: {
       path: "name",
       name: "Имя",
-      component: (item) => {
-        return <p>{item.name}</p>;
-      },
-      sorting: (a, b) => {
-        if (a.name > b.name) {
-          return 1;
-        }
-        if (a.name < b.name) {
-          return -1;
-        }
-        return 0;
-      },
     },
     age: {
       path: "age",
       name: "Возраст",
-
-      sorting: (a, b) => {
-        if (a.age > b.age) {
-          return 1;
-        }
-        if (a.age < b.age) {
-          return -1;
-        }
-        if (a.age === b.age) {
-          if (a.name > b.name) {
-            return 1;
-          }
-          if (a.name < b.name) {
-            return -1;
-          }
-          return 0;
-        }
-      },
     },
     qualities: {
-      path: "qualities",
       name: "Качества",
+      component: (item) => {
+        return <Qualities qualities={item.qualities} />;
+      },
     },
     profession: {
-      path: "profession",
+      path: "profession.name",
       name: "Профессия",
-      sorting: (b, a) => {
-        if (a.profession.name > b.profession.name) {
-          return 1;
-        }
-        if (a.profession.name < b.profession.name) {
-          return -1;
-        }
-        return 0;
+      component: (item) => {
+        return <Profession profession={item.profession} />;
       },
     },
     delete: {
-      name: "Удалить",
+      name: "Delete",
       component: (item) => {
         return <button onClick={() => console.log(item)}>Delete</button>;
       },
@@ -84,29 +38,35 @@ function Table() {
 
   const renderColumn = (item, column) => {
     const component = columns[column].component;
-    const path = columns[column].path;
     if (component && typeof component === "function") {
-      return component(item, column);
-    } else if (path === "age") {
-      return item[column];
-    } else if (path === "profession") {
-      return <Profession item={item} column={column} />;
-    } else if (path === "qualities") {
-      return <Quality item={item} column={column} />;
+      return component(item);
     }
+    return item[column];
   };
 
-  const sortUsers = (column) => {
-    setUsers((users) => {
-      if (sorting === false) {
-        setSorting(true);
-        return users.toSorted(columns[column].sorting);
-      } else {
-        setSorting(false);
-        return users.toSorted((a, b) => columns[column].sorting(b, a));
-      }
-    });
+  const getValueByPath = (object, path) => {
+    const str = path.split(".").reduce((acc, key) => acc[key], object);
+
+    return str;
   };
+
+  const handleSort = (item) => {
+    setSortBy({ path: item, order: sortBy.order === "asc" ? "desc" : "asc" });
+  };
+
+  const sortedUsers = data.users.slice().sort((a, b) => {
+    const aValue = getValueByPath(a, sortBy.path);
+    const bValue = getValueByPath(b, sortBy.path);
+    if (typeof aValue === "string" && typeof bValue === "string") {
+      return sortBy.order === "asc"
+        ? aValue.localeCompare(bValue)
+        : bValue.localeCompare(aValue);
+    }
+    if (typeof aValue === "number" && typeof bValue === "number") {
+      return sortBy.order === "asc" ? aValue - bValue : bValue - aValue;
+    }
+    return 0;
+  });
 
   return (
     <>
@@ -114,20 +74,20 @@ function Table() {
       <table>
         <thead>
           <tr>
-            {Object.keys(columns).map((column) => (
+            {Object.keys(columns).map((key) => (
               <th
-                key={column}
-                onClick={() => {
-                  sortUsers(column);
-                }}
+                key={key}
+                onClick={
+                  columns[key].path && handleSort.bind(null, columns[key].path)
+                }
               >
-                {columns[column].name}
+                {columns[key].name}
               </th>
             ))}
           </tr>
         </thead>
         <tbody>
-          {users.map((item) => (
+          {sortedUsers.map((item) => (
             <tr key={item._id}>
               {Object.keys(columns).map((column) => {
                 return <td key={column}>{renderColumn(item, column)}</td>;
@@ -138,6 +98,4 @@ function Table() {
       </table>
     </>
   );
-}
-
-export default Table;
+};
